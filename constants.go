@@ -7,7 +7,7 @@ const Finality = 500
 const SealRandomnessLookback = Finality
 
 // Epochs
-const SealRandomnessLookbackLimit = SealRandomnessLookback + 2000
+const SealRandomnessLookbackLimit = SealRandomnessLookback + 10000
 
 // Epochs
 const InteractivePoRepConfidence = 6
