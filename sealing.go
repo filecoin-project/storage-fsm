@@ -42,6 +42,8 @@ type SealingAPI interface {
 	ChainReadObj(context.Context, cid.Cid) ([]byte, error)
 }
 
+type SectorStateNotifee func(before, after SectorInfo)
+
 type Sealing struct {
 	api    SealingAPI
 	events Events
@@ -53,10 +55,11 @@ type Sealing struct {
 	sc      SectorIDCounter
 	verif   ffiwrapper.Verifier
 
-	pcp PreCommitPolicy
+	pcp     PreCommitPolicy
+	notifee SectorStateNotifee
 }
 
-func New(api SealingAPI, events Events, maddr address.Address, ds datastore.Batching, sealer sectorstorage.SectorManager, sc SectorIDCounter, verif ffiwrapper.Verifier, pcp PreCommitPolicy) *Sealing {
+func New(api SealingAPI, events Events, maddr address.Address, ds datastore.Batching, sealer sectorstorage.SectorManager, sc SectorIDCounter, verif ffiwrapper.Verifier, pcp PreCommitPolicy, notifee SectorStateNotifee) *Sealing {
 	s := &Sealing{
 		api:    api,
 		events: events,
@@ -66,6 +69,8 @@ func New(api SealingAPI, events Events, maddr address.Address, ds datastore.Batc
 		sc:     sc,
 		verif:  verif,
 		pcp:    pcp,
+
+		notifee: notifee,
 	}
 
 	s.sectors = statemachine.New(namespace.Wrap(ds, datastore.NewKey(SectorStorePrefix)), s, SectorInfo{})
