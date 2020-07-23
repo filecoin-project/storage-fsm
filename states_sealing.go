@@ -183,7 +183,7 @@ func (m *Sealing) handlePreCommitting(ctx statemachine.Context, sector SectorInf
 
 	deposit := big.Max(depositMinimum, collateral)
 
-	log.Infof("submitting precommit for sector (deposit: %s): ", sector.SectorNumber, deposit)
+	log.Infof("submitting precommit for sector (deposit: %s): need deposit amount = %d", sector.SectorNumber, deposit)
 	mcid, err := m.api.SendMsg(ctx.Context(), waddr, m.maddr, builtin.MethodsMiner.PreCommitSector, deposit, big.NewInt(1), 1000000, enc.Bytes())
 	if err != nil {
 		return ctx.Send(SectorChainPreCommitFailed{xerrors.Errorf("pushing message to mpool: %w", err)})
