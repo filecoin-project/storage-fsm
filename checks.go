@@ -76,6 +76,9 @@ func checkPrecommit(ctx context.Context, maddr address.Address, si SectorInfo, t
 	if err != nil {
 		return &ErrApi{xerrors.Errorf("calling StateComputeDataCommitment: %w", err)}
 	}
+	if sector.CommD == nil {
+		return &ErrPrecommitOnChain{}
+	}
 
 	if !commD.Equals(*si.CommD) {
 		return &ErrBadCommD{xerrors.Errorf("on chain CommD differs from sector: %s != %s", commD, si.CommD)}

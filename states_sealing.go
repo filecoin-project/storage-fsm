@@ -257,7 +257,12 @@ func (m *Sealing) handleCommitting(ctx statemachine.Context, sector SectorInfo) 
 	log.Info("scheduling seal proof computation...")
 
 	log.Infof("KOMIT %d %x(%d); %x(%d); %v; r:%x; d:%x", sector.SectorNumber, sector.TicketValue, sector.TicketEpoch, sector.SeedValue, sector.SeedEpoch, sector.pieceInfos(), sector.CommR, sector.CommD)
-
+	if sector.CommD == nil {
+		return &ErrPrecommitOnChain{}
+	}
+	if sector.CommR == nil {
+		return &ErrPrecommitOnChain{}
+	}
 	cids := storage.SectorCids{
 		Unsealed: *sector.CommD,
 		Sealed:   *sector.CommR,
