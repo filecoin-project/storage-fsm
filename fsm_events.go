@@ -191,6 +191,9 @@ type SectorCommitFailed struct{ error }
 func (evt SectorCommitFailed) FormatError(xerrors.Printer) (next error) { return evt.error }
 func (evt SectorCommitFailed) apply(*SectorInfo)                        {}
 
+type SectorRetryCommitWait struct{}
+func (evt SectorRetryCommitWait) apply(*SectorInfo) {}
+
 type SectorCommitted struct {
 	Message cid.Cid
 	Proof   []byte
