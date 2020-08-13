@@ -3,6 +3,7 @@ package sealing
 import (
 	"bytes"
 	"context"
+	"errors"
 
 	"golang.org/x/xerrors"
 
@@ -314,6 +315,9 @@ func (m *Sealing) handleCommitting(ctx statemachine.Context, sector SectorInfo) 
 		return nil
 	}
 
+	if sector.PreCommitInfo == nil {
+		return errors.New("handleCommitting: PreCommitInfo is nil")
+	}
 	collateral, err := m.api.StateMinerInitialPledgeCollateral(ctx.Context(), m.maddr, *sector.PreCommitInfo, tok)
 	if err != nil {
 		return xerrors.Errorf("getting initial pledge collateral: %w", err)
