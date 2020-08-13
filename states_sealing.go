@@ -202,7 +202,7 @@ func (m *Sealing) handlePreCommitWait(ctx statemachine.Context, sector SectorInf
 	log.Info("Sector precommitted: ", sector.SectorNumber)
 	mw, err := m.api.StateWaitMsg(ctx.Context(), *sector.PreCommitMessage)
 	if err != nil {
-		if strings.Contains(err.Error(), "websocket connection closed") {
+		if isRetryWaitErr(err) {
 			if err := failedCooldown(ctx, sector); err != nil {
 				return err
 			}
@@ -269,7 +269,7 @@ func (m *Sealing) handleWaitSeed(ctx statemachine.Context, sector SectorInfo) er
 	}, InteractivePoRepConfidence, randHeight)
 	if err != nil {
 		log.Warn("waitForPreCommitMessage ChainAt errored: ", err)
-		if strings.Contains(err.Error(), "websocket connection closed") {
+		if isRetryWaitErr(err) {
 			if err := failedCooldown(ctx, sector); err != nil {
 				return err
 			}
@@ -365,7 +365,7 @@ func (m *Sealing) handleCommitWait(ctx statemachine.Context, sector SectorInfo) 
 
 	mw, err := m.api.StateWaitMsg(ctx.Context(), *sector.CommitMessage)
 	if err != nil {
-		if strings.Contains(err.Error(), "websocket connection closed") {
+		if isRetryWaitErr(err) {
 			if err := failedCooldown(ctx, sector); err != nil {
 				return err
 			}
@@ -408,4 +408,8 @@ func (m *Sealing) handleProvingSector(ctx statemachine.Context, sector SectorInf
 	// TODO: Auto-extend if set
 
 	return nil
+}
+
+func isRetryWaitErr(err error) bool {
+	return strings.Contains(err.Error(), "websocket connection closed") || strings.Contains(err.Error(), "failed to load message: datastore closed")
 }
